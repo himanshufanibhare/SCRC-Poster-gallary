@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% if poster %}{{ poster.name }} - {% endif %}SCRC Poster Gallery</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-row">
+            <div>
+                <h1 class="site-title">{% if poster %}{{ poster.name }}{% else %}SCRC Poster Gallery{% endif %}</h1>
+                <p class="site-sub">{% if poster and poster.description %}{{ poster.description }}{% else %}Scan the QR
+                    or use the player below{% endif %}</p>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+                <a href="/" class="header-qr-btn" aria-label="Back to Gallery" title="Gallery">
+                    <!-- Gallery/Grid icon -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1" />
+                    </svg>
+                </a>
+                {% if qr_path %}
+                <button id="header-qr-btn" class="header-qr-btn" aria-label="Show QR">
+                    <!-- QR SVG icon -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="8" height="8" stroke="currentColor" stroke-width="1.5" />
+                        <rect x="13" y="3" width="8" height="8" stroke="currentColor" stroke-width="1.5" />
+                        <rect x="3" y="13" width="8" height="8" stroke="currentColor" stroke-width="1.5" />
+                        <rect x="13" y="13" width="2" height="2" fill="currentColor" />
+                        <rect x="17" y="17" width="4" height="4" fill="currentColor" />
+                    </svg>
+                </button>
+                {% endif %}
+                <a href="/admin/dashboard" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin">
+                    <!-- Admin/Settings icon -->
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
+                        <path d="M12 1v6m0 6v10M1 12h6m6 0h10" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" />
+                        <path d="M4.22 4.22l4.24 4.24m7.07 0l4.24-4.24M4.22 19.78l4.24-4.24m7.07 0l4.24 4.24"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main">
+        <section class="card poster-card">
+            <div class="poster-wrap">
+                {% if poster_img %}
+                <div class="poster-container">
+                    <img src="{{ poster_img }}" alt="poster" class="poster" id="poster-image" />
+                    <div class="highlight-overlay" id="highlight-overlay"></div>
+                </div>
+                {% else %}
+                <div class="poster-missing">No poster found. Place `poster1.jpg` or a PDF in the `static/` folder.</div>
+                {% endif %}
+            </div>
+
+            <div class="controls">
+                <audio id="audio" src="{% if poster %}/music/{{ poster.id }}{% else %}/music.mp3{% endif %}"
+                    preload="none"></audio>
+                <button id="play-btn" class="play-btn" aria-label="Play">Play</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- QR Modal -->
+    {% if qr_path %}
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Scan to Access</h2>
+            <img src="{{ qr_path }}" alt="QR Code" class="modal-qr" />
+            <div class="modal-actions">
+                <button id="download-btn" class="share-btn" aria-label="Download QR">
+                    <!-- download icon -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span>Download</span>
+                </button>
+                <button id="share-btn" class="share-btn" aria-label="Share QR">
+                    <!-- share icon -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 3v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M7 8l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span>Share</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        const POSTER_ID = '{{ poster.id if poster else "scrc-architecture" }}';
+        const audio = document.getElementById('audio');
+        const btn = document.getElementById('play-btn');
+        const highlightOverlay = document.getElementById('highlight-overlay');
+        const posterImage = document.getElementById('poster-image');
+        let sectionsData = [];
+        let highlightRectangles = [];
+
+        if (!btn) {
+            console.error('Play button not found!');
+        }
+        if (!audio) {
+            console.error('Audio element not found!');
+        }
+
+        if (btn) {
+            btn.addEventListener('click', () => {
+                // Re-get audio element reference to ensure it's current
+                const audioEl = document.getElementById('audio');
+                if (!audioEl) {
+                    console.error('Audio element not found!');
+                    return;
+                }
+
+                console.log('Play button clicked, audio paused:', audioEl.paused);
+
+                if (audioEl.paused) {
+                    audioEl.play().then(() => {
+                        console.log('Audio playing successfully');
+                        btn.textContent = 'Pause';
+                        btn.classList.add('playing');
+                    }).catch(async (err) => {
+                        console.error('Play failed (first attempt):', err);
+                        // Try to reload and play again
+                        try {
+                            const src = audioEl.src;
+                            audioEl.pause();
+                            audioEl.removeAttribute('src');
+                            audioEl.load();
+                            audioEl.src = src;
+                            audioEl.load();
+                            // wait for canplay or timeout
+                            await new Promise((resolve, reject) => {
+                                let settled = false;
+                                const onCan = () => { if (settled) return; settled = true; audioEl.removeEventListener('canplay', onCan); audioEl.removeEventListener('error', onErr); resolve(); };
+                                const onErr = (e) => { if (settled) return; settled = true; audioEl.removeEventListener('canplay', onCan); audioEl.removeEventListener('error', onErr); reject(e); };
+                                audioEl.addEventListener('canplay', onCan);
+                                audioEl.addEventListener('error', onErr);
+                                setTimeout(() => { if (settled) return; settled = true; audioEl.removeEventListener('canplay', onCan); audioEl.removeEventListener('error', onErr); reject(new Error('canplay timeout')); }, 3000);
+                            });
+                            await audioEl.play();
+                            console.log('Audio playing after reload');
+                            btn.textContent = 'Pause';
+                            btn.classList.add('playing');
+                        } catch (err2) {
+                            console.error('Play retry failed:', err2);
+                            btn.textContent = 'Play';
+                            btn.classList.remove('playing');
+                        }
+                    });
+                } else {
+                    audioEl.pause();
+                    console.log('Audio paused');
+                    btn.textContent = 'Play';
+                    btn.classList.remove('playing');
+                }
+            });
+        }
+
+        if (audio) {
+            audio.addEventListener('ended', () => {
+                btn.textContent = 'Play';
+                btn.classList.remove('playing');
+                clearAllHighlights();
+            });
+
+            // Update highlights on timeupdate
+            audio.addEventListener('timeupdate', () => {
+                updateHighlights(audio.currentTime);
+            });
+
+            // Diagnostic listeners to help debug playback issues
+            audio.addEventListener('play', () => {
+                console.log('Audio event: play');
+            });
+            audio.addEventListener('pause', () => {
+                console.log('Audio event: pause');
+            });
+            audio.addEventListener('error', (e) => {
+                console.error('Audio event: error', e, 'audio.readyState=', audio.readyState);
+            });
+            audio.addEventListener('canplay', () => {
+                console.log('Audio event: canplay');
+            });
+            audio.addEventListener('loadedmetadata', () => {
+                console.log('Audio event: loadedmetadata, duration=', audio.duration);
+            });
+            audio.addEventListener('stalled', () => { console.warn('Audio event: stalled'); });
+            audio.addEventListener('suspend', () => { console.warn('Audio event: suspend'); });
+        }
+
+        // Load sections configuration and initialize highlights
+        async function loadSections() {
+            try {
+                console.log('Loading sections for poster:', POSTER_ID);
+                const response = await fetch(`/api/sections?poster_id=${POSTER_ID}`);
+                const data = await response.json();
+                sectionsData = data.sections || [];
+                console.log('Loaded', sectionsData.length, 'sections');
+                initializeHighlights();
+            } catch (error) {
+                console.error('Failed to load sections:', error);
+            }
+        }
+
+        function initializeHighlights() {
+            if (!highlightOverlay || !posterImage) return;
+
+            // Clear existing rectangles
+            highlightOverlay.innerHTML = '';
+            highlightRectangles = [];
+
+            sectionsData.forEach(section => {
+                const rect = createHighlightRectangle(section);
+                highlightOverlay.appendChild(rect);
+                highlightRectangles.push({
+                    element: rect,
+                    section: section
+                });
+            });
+        }
+
+        function createHighlightRectangle(section) {
+            const rect = document.createElement('div');
+            rect.className = 'highlight-rectangle';
+            rect.dataset.sectionId = section.id;
+
+            // Handle both percentage strings and pixel numbers
+            rect.style.left = typeof section.position.x === 'string' ? section.position.x : section.position.x + 'px';
+            rect.style.top = typeof section.position.y === 'string' ? section.position.y : section.position.y + 'px';
+            rect.style.width = typeof section.size.width === 'string' ? section.size.width : section.size.width + 'px';
+            rect.style.height = typeof section.size.height === 'string' ? section.size.height : section.size.height + 'px';
+
+            rect.style.backgroundColor = hexToRgba(section.color, section.transparency);
+            rect.style.borderColor = section.borderColor;
+            rect.style.borderWidth = section.borderWidth + 'px';
+            rect.style.borderRadius = (section.borderRadius || 4) + 'px';
+            rect.style.display = 'none'; // Hidden by default
+            rect.title = section.name || section.id;
+
+            return rect;
+        }
+
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function updateHighlights(currentTime) {
+            let visibleCount = 0;
+            highlightRectangles.forEach(({ element, section }) => {
+                if (currentTime >= section.startTime && currentTime < section.endTime) {
+                    element.style.display = 'block';
+                    element.style.cursor = 'default';
+                    visibleCount++;
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+            if (visibleCount > 0) {
+                console.log(`Time: ${currentTime.toFixed(2)}s - ${visibleCount} sections visible`);
+            }
+        }
+
+        function clearAllHighlights() {
+            highlightRectangles.forEach(({ element }) => {
+                element.style.display = 'none';
+            });
+        }
+
+        // Load sections on page load
+        console.log('=== Page Loaded ===');
+        console.log('POSTER_ID:', POSTER_ID);
+        console.log('posterImage:', posterImage);
+        console.log('audio element:', audio);
+        console.log('audio.src:', audio ? audio.src : 'not found');
+
+        if (posterImage) {
+            loadSections();
+        } else {
+            console.warn('No poster image found, skipping sections load');
+        }
+
+        // Verify audio resource is available; disable play button if missing
+        async function checkAudioAvailable() {
+            try {
+                const audioEl = document.getElementById('audio');
+                if (!audioEl || !audioEl.src) return;
+                // Use HEAD to quickly check resource availability
+                const resp = await fetch(audioEl.src, { method: 'HEAD' });
+                if (!resp.ok) {
+                    console.warn('Audio resource not available (status=' + resp.status + '), disabling play button');
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.title = 'Audio file not found on server';
+                    }
+                } else {
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.title = '';
+                    }
+                }
+            } catch (err) {
+                console.error('Error checking audio availability:', err);
+            }
+        }
+
+        // Run check after load
+        checkAudioAvailable();
+
+        // QR Modal (header button + share + download)
+        const headerQrBtn = document.getElementById('header-qr-btn');
+        const modal = document.getElementById('qr-modal');
+        const closeBtn = document.querySelector('.close');
+        const shareBtn = document.getElementById('share-btn');
+        const downloadBtn = document.getElementById('download-btn');
+
+        function openModal() { if (modal) modal.style.display = 'flex'; }
+        function closeModal() { if (modal) modal.style.display = 'none'; }
+
+        if (headerQrBtn) headerQrBtn.addEventListener('click', openModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        // Download QR code
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', async () => {
+                try {
+                    const qrImage = document.querySelector('.modal-qr');
+                    if (!qrImage) {
+                        alert('QR code image not found');
+                        return;
+                    }
+
+                    const response = await fetch(qrImage.src);
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'qr-code.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+
+                    const original = downloadBtn.innerHTML;
+                    downloadBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Downloaded!</span>';
+                    setTimeout(() => { downloadBtn.innerHTML = original; }, 1500);
+                } catch (err) {
+                    console.error('Download failed:', err);
+                    alert('Failed to download QR code');
+                }
+            });
+        }
+
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async () => {
+                const posterUrl = `${window.location.origin}/poster/${POSTER_ID}`;
+                const shareData = { title: document.title, text: 'Scan this QR to open the poster', url: posterUrl };
+                try {
+                    if (navigator.share) {
+                        await navigator.share(shareData);
+                    } else if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(posterUrl);
+                        const original = shareBtn.innerHTML;
+                        shareBtn.innerHTML = 'Copied!';
+                        setTimeout(() => { shareBtn.innerHTML = original; }, 1500);
+                    } else {
+                        // fallback: create temporary input
+                        const tmp = document.createElement('input');
+                        tmp.value = posterUrl;
+                        document.body.appendChild(tmp);
+                        tmp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tmp);
+                        const original = shareBtn.innerHTML;
+                        shareBtn.innerHTML = 'Copied!';
+                        setTimeout(() => { shareBtn.innerHTML = original; }, 1500);
+                    }
+                } catch (err) {
+                    console.error('Share failed', err);
+                }
+            });
+        }
+    </script>
+
+    <footer class="site-footer">
+        <div class="container">
+            <small>&lt;/&gt; Developed by <a href="https://himanshu-portfolio-beryl.vercel.app/" target="_blank"
+                    rel="noopener noreferrer">Himanshu Fanibhare</a></small>
+        </div>
+    </footer>
+</body>
+
+</html>

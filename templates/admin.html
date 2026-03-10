@@ -1,0 +1,1455 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SCRC Poster Gallery</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-row">
+            <div>
+                <h1 class="site-title">SCRC Poster Gallery - Admin</h1>
+                <p class="site-sub">Edit poster sections</p>
+            </div>
+            <div style="display:flex;gap:10px">
+                <a href="/" class="header-qr-btn" aria-label="Home Gallery" title="Home">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+                    </svg>
+                </a>
+                {% if qr_path %}
+                <button id="header-qr-btn" class="header-qr-btn" aria-label="Show QR" title="Show QR Code">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="2" width="9" height="9" stroke="currentColor" stroke-width="2" rx="1" />
+                        <rect x="13" y="2" width="9" height="9" stroke="currentColor" stroke-width="2" rx="1" />
+                        <rect x="2" y="13" width="9" height="9" stroke="currentColor" stroke-width="2" rx="1" />
+                        <rect x="5" y="5" width="3" height="3" fill="currentColor" rx="0.5" />
+                        <rect x="16" y="5" width="3" height="3" fill="currentColor" rx="0.5" />
+                        <rect x="5" y="16" width="3" height="3" fill="currentColor" rx="0.5" />
+                        <path d="M13 13h3v3h-3zM17 13h2v2h-2zM13 17h2v2h-2zM17 17h5v5h-5z" fill="currentColor" />
+                    </svg>
+                </button>
+                {% endif %}
+                <a href="/admin" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin Dashboard">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="8" r="5" stroke="currentColor" stroke-width="2" />
+                        <path d="M20 21c0-4.4-3.6-8-8-8s-8 3.6-8 8" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                </a>
+                <button id="logout-btn" class="header-qr-btn" aria-label="Logout" title="Logout">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5z" fill="currentColor" />
+                        <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2v-7h-2v7z"
+                            fill="currentColor" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main">
+        <section class="card poster-card">
+            <div class="poster-wrap">
+                {% if poster_img %}
+                <div class="poster-container">
+                    <img src="{{ poster_img }}" alt="poster" class="poster" id="poster-image" />
+                    <div class="highlight-overlay" id="highlight-overlay"></div>
+                </div>
+                {% else %}
+                <div class="poster-missing">No poster found. Place `poster1.jpg` or a PDF in the `static/` folder.</div>
+                {% endif %}
+            </div>
+
+            <div class="controls">
+                <audio id="audio" src="{% if poster %}/music/{{ poster.id }}{% else %}/music.mp3{% endif %}"
+                    preload="none"></audio>
+                <button id="play-btn" class="play-btn" aria-label="Play">Play</button>
+                <button id="edit-btn" class="edit-btn" aria-label="Edit Sections">Edit Sections</button>
+                <button id="music-btn" class="edit-btn" aria-label="Change Music"
+                    style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                        style="margin-right: 6px; vertical-align: middle;">
+                        <path d="M9 18V5l12-2v13" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="2" />
+                        <circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    Change Music
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- QR Modal -->
+    {% if qr_path %}
+    <div id="qr-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Scan to Access</h2>
+            <img src="{{ qr_path }}" alt="QR Code" class="modal-qr" />
+            <div class="modal-actions">
+                <button id="download-btn" class="share-btn" aria-label="Download QR">
+                    <!-- download icon -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <polyline points="7 10 12 15 17 10" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <line x1="12" y1="15" x2="12" y2="3" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span>Download</span>
+                </button>
+                <button id="share-btn" class="share-btn" aria-label="Share QR">
+                    <!-- share icon -->
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" stroke="currentColor" stroke-width="1.5"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M12 3v14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M7 8l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span>Share</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Property Editor Modal -->
+    <div id="editor-modal" class="editor-modal">
+        <div class="editor-content">
+            <h3>
+                <span>Edit Section Properties</span>
+                <button type="button" class="modal-close-btn" onclick="closeEditorModal()">✕</button>
+            </h3>
+            <form id="editor-form" class="editor-form">
+                <div class="form-group">
+                    <label for="edit-id">ID</label>
+                    <input type="text" id="edit-id" required readonly
+                        style="background: rgba(15, 23, 36, 0.4); cursor: not-allowed;" />
+                </div>
+                <div class="form-group">
+                    <label for="edit-name">Name</label>
+                    <input type="text" id="edit-name" required />
+                </div>
+                <div class="form-group">
+                    <label for="edit-shape">Shape</label>
+                    <select id="edit-shape" required>
+                        <option value="rectangle">Rectangle</option>
+                        <option value="circle">Circle/Ellipse</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-x">Position X (%)</label>
+                        <input type="text" id="edit-x" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-y">Position Y (%)</label>
+                        <input type="text" id="edit-y" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-width">Width (%)</label>
+                        <input type="text" id="edit-width" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-height">Height (%)</label>
+                        <input type="text" id="edit-height" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-start">Start Time (s)</label>
+                        <input type="number" id="edit-start" step="0.1" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-end">End Time (s)</label>
+                        <input type="number" id="edit-end" step="0.1" required />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-color">Fill Color</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="color" id="edit-color" required
+                            style="width: 60px; height: 36px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); padding: 2px;" />
+                        <input type="text" id="edit-color-hex" required readonly
+                            style="flex: 1; background: rgba(15, 23, 36, 0.4); cursor: default;" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-transparency">Transparency (0-1)</label>
+                    <input type="number" id="edit-transparency" step="0.05" min="0" max="1" required />
+                </div>
+                <div class="form-group">
+                    <label for="edit-border-color">Border Color</label>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="color" id="edit-border-color" required
+                            style="width: 60px; height: 36px; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); padding: 2px;" />
+                        <input type="text" id="edit-border-color-hex" required readonly
+                            style="flex: 1; background: rgba(15, 23, 36, 0.4); cursor: default;" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-border-width">Border Width (px)</label>
+                        <input type="number" id="edit-border-width" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-border-radius">Border Radius (px)</label>
+                        <input type="number" id="edit-border-radius" min="0" required />
+                    </div>
+                </div>
+                <div class="editor-actions">
+                    <div style="display:flex;gap:8px;width:100%;">
+                        <button type="button" class="editor-btn editor-btn-add" id="editor-add-btn">+ Add
+                            Section</button>
+                        <button type="button" class="editor-btn editor-btn-delete" id="editor-delete-btn">Delete
+                            Section</button>
+                    </div>
+                    <div style="display:flex;gap:8px;width:100%;margin-top:8px;">
+                        <button type="button" class="editor-btn editor-btn-cancel" id="editor-cancel">Cancel</button>
+                        <button type="submit" class="editor-btn editor-btn-save">Save Changes</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Music Upload Modal -->
+    <div id="music-modal" class="editor-modal">
+        <div class="editor-content" style="max-width: 500px;">
+            <h3>
+                <span>Change Music</span>
+                <button type="button" class="modal-close-btn" onclick="closeMusicModal()">✕</button>
+            </h3>
+            <form id="music-form" class="editor-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="music-file">Select Audio File</label>
+                    <input type="file" id="music-file" accept="audio/*" required
+                        style="padding: 10px; background: rgba(15, 23, 36, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; color: #e6eef6; cursor: pointer;" />
+                    <small style="color: var(--muted); font-size: 11px; margin-top: 4px; display: block;">Supported
+                        formats: MP3, WAV, OGG, M4A</small>
+                </div>
+                <div class="form-group" id="current-music-info"
+                    style="margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 6px;">
+                    <label style="margin-bottom: 8px; display: block;">Current Music</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 18V5l12-2v13\" stroke="currentColor" stroke-width="2\" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                            <circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="2" />
+                            <circle cx="18" cy="16" r="3" stroke="currentColor" stroke-width="2" />
+                        </svg>
+                        <span id="current-music-name" style="color: var(--muted); font-size: 13px;">Loading...</span>
+                    </div>
+                </div>
+                <div class="editor-actions" style="margin-top: 20px;">
+                    <button type="button" class="editor-btn editor-btn-cancel"
+                        onclick="closeMusicModal()">Cancel</button>
+                    <button type="submit" class="editor-btn editor-btn-save">Upload Music</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const POSTER_ID = '{{ poster.id if poster else "scrc-architecture" }}';
+        const audio = document.getElementById('audio');
+        const btn = document.getElementById('play-btn');
+        const highlightOverlay = document.getElementById('highlight-overlay');
+        const posterImage = document.getElementById('poster-image');
+        let sectionsData = [];
+        let highlightRectangles = [];
+
+        // Property Editor Modal Variables (must be declared early)
+        let currentEditingSection = null;
+        let currentEditingElement = null;
+        const editorModal = document.getElementById('editor-modal');
+        const editorForm = document.getElementById('editor-form');
+
+        btn.addEventListener('click', () => {
+            // Re-get audio element reference to ensure it's current
+            const audioEl = document.getElementById('audio');
+            if (!audioEl) {
+                console.error('Audio element not found!');
+                return;
+            }
+
+            if (audioEl.paused) {
+                audioEl.play().catch(err => {
+                    console.error('Play failed:', err);
+                    btn.textContent = 'Play';
+                    btn.classList.remove('playing');
+                });
+                btn.textContent = 'Pause';
+                btn.classList.add('playing');
+            } else {
+                audioEl.pause();
+                btn.textContent = 'Play';
+                btn.classList.remove('playing');
+            }
+        });
+
+        audio.addEventListener('ended', () => {
+            btn.textContent = 'Play';
+            btn.classList.remove('playing');
+            clearAllHighlights();
+        });
+
+        // Load sections configuration and initialize highlights
+        async function loadSections() {
+            try {
+                const response = await fetch(`/api/sections?poster_id=${POSTER_ID}`);
+                const data = await response.json();
+                sectionsData = data.sections || [];
+                initializeHighlights();
+            } catch (error) {
+                console.error('Failed to load sections:', error);
+            }
+        }
+
+        function initializeHighlights() {
+            if (!highlightOverlay || !posterImage) return;
+
+            console.log('Initializing highlights for', sectionsData.length, 'sections');
+
+            // Clear existing rectangles
+            highlightOverlay.innerHTML = '';
+            highlightRectangles = [];
+
+            sectionsData.forEach(section => {
+                const rect = createHighlightRectangle(section);
+                highlightOverlay.appendChild(rect);
+                highlightRectangles.push({
+                    element: rect,
+                    section: section
+                });
+            });
+
+            // Make rectangles editable if in edit mode
+            if (isEditing) {
+                makeRectanglesEditable();
+                // Show all rectangles when in edit mode
+                highlightRectangles.forEach(({ element }) => {
+                    element.style.display = 'block';
+                    element.style.pointerEvents = 'auto';
+                    // Show resize handles and edit button
+                    element.querySelectorAll('.resize-handle').forEach(handle => {
+                        handle.style.display = 'block';
+                    });
+                    const sectionEditBtn = element.querySelector('.section-edit-btn');
+                    if (sectionEditBtn) sectionEditBtn.classList.add('visible');
+                });
+            }
+        }
+
+        function createHighlightRectangle(section) {
+            const rect = document.createElement('div');
+            rect.className = 'highlight-rectangle';
+            rect.dataset.sectionId = section.id;
+
+            // Handle both percentage strings and pixel numbers
+            rect.style.left = typeof section.position.x === 'string' ? section.position.x : section.position.x + 'px';
+            rect.style.top = typeof section.position.y === 'string' ? section.position.y : section.position.y + 'px';
+            rect.style.width = typeof section.size.width === 'string' ? section.size.width : section.size.width + 'px';
+            rect.style.height = typeof section.size.height === 'string' ? section.size.height : section.size.height + 'px';
+
+            rect.style.backgroundColor = hexToRgba(section.color, section.transparency);
+            rect.style.borderColor = section.borderColor;
+            rect.style.borderWidth = section.borderWidth + 'px';
+
+            // Apply shape
+            const shape = section.shape || 'rectangle';
+            if (shape === 'circle' || shape === 'ellipse') {
+                rect.style.borderRadius = '50%';
+            } else {
+                rect.style.borderRadius = (section.borderRadius || 4) + 'px';
+            }
+
+            rect.style.display = 'none'; // Hidden by default
+            rect.title = section.name || section.id;
+
+            // Add resize handles
+            const handles = ['nw', 'ne', 'sw', 'se'];
+            handles.forEach(handle => {
+                const handleEl = document.createElement('div');
+                handleEl.className = `resize-handle resize-${handle}`;
+                handleEl.style.display = 'none';
+                rect.appendChild(handleEl);
+            });
+
+            // Add edit button (visible on hover)
+            const editBtn = document.createElement('div');
+            editBtn.className = 'section-edit-btn';
+            editBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            `;
+            editBtn.title = 'Edit Properties';
+            editBtn.dataset.editButton = 'true';
+
+            console.log('Creating edit button for section:', section.id);
+
+            // Test mouse events
+            editBtn.addEventListener('mouseenter', () => {
+                console.log('Mouse entered edit button for:', section.id);
+            });
+
+            // Single click to open editor
+            editBtn.addEventListener('click', (e) => {
+                console.log('Edit button clicked for section:', section.id);
+                console.log('Event target:', e.target);
+                console.log('openEditorModal function exists:', typeof openEditorModal);
+                e.stopPropagation();
+                e.preventDefault();
+                try {
+                    openEditorModal(section, rect);
+                } catch (err) {
+                    console.error('Error opening modal:', err);
+                    alert('Error: ' + err.message);
+                }
+            });
+
+            // Single-click on rectangle to open editor when in edit mode
+            rect.addEventListener('click', (e) => {
+                console.log('Rectangle clicked for section:', section.id, 'isEditing=', isEditing);
+                if (!isEditing) return;
+                e.stopPropagation();
+                e.preventDefault();
+                try {
+                    openEditorModal(section, rect);
+                } catch (err) {
+                    console.error('Error opening modal from rect click:', err);
+                }
+            });
+            rect.appendChild(editBtn);
+
+            return rect;
+        }
+
+        // Property Editor Modal Functions
+        function openEditorModal(section, element) {
+            console.log('Opening editor for section:', section.id);
+
+            if (!editorModal) {
+                console.error('Editor modal not found!');
+                alert('Editor modal not found. Please refresh the page.');
+                return;
+            }
+
+            currentEditingSection = section;
+            currentEditingElement = element;
+
+            // Populate form
+            document.getElementById('edit-id').value = section.id;
+            document.getElementById('edit-name').value = section.name || '';
+            document.getElementById('edit-shape').value = section.shape || 'rectangle';
+            document.getElementById('edit-x').value = section.position.x;
+            document.getElementById('edit-y').value = section.position.y;
+            document.getElementById('edit-width').value = section.size.width;
+            document.getElementById('edit-height').value = section.size.height;
+            document.getElementById('edit-start').value = section.startTime;
+            document.getElementById('edit-end').value = section.endTime;
+            // Ensure color is in proper hex format for color input
+            const colorHex = ensureHexColor(section.color);
+            document.getElementById('edit-color').value = colorHex;
+            document.getElementById('edit-color-hex').value = colorHex;
+            document.getElementById('edit-transparency').value = section.transparency;
+            // Ensure border color is in proper hex format
+            const borderColorHex = ensureHexColor(section.borderColor);
+            document.getElementById('edit-border-color').value = borderColorHex;
+            document.getElementById('edit-border-color-hex').value = borderColorHex;
+            document.getElementById('edit-border-width').value = section.borderWidth;
+            document.getElementById('edit-border-radius').value = section.borderRadius || 4;
+
+            // Disable/enable border radius based on shape
+            const shapeValue = section.shape || 'rectangle';
+            const borderRadiusInput = document.getElementById('edit-border-radius');
+            if (shapeValue === 'circle' || shapeValue === 'ellipse') {
+                borderRadiusInput.disabled = true;
+                borderRadiusInput.style.opacity = '0.5';
+                borderRadiusInput.style.cursor = 'not-allowed';
+            } else {
+                borderRadiusInput.disabled = false;
+                borderRadiusInput.style.opacity = '1';
+                borderRadiusInput.style.cursor = 'text';
+            }
+
+            editorModal.classList.add('active');
+            // ensure visible even if CSS has issues
+            editorModal.style.display = 'flex';
+            // focus name input (ID is readonly)
+            const firstInput = document.getElementById('edit-name');
+            if (firstInput) firstInput.focus();
+            console.log('Modal should be visible now');
+            // Enable delete button while editing
+            try {
+                const editorDeleteBtnLocal = document.getElementById('editor-delete-btn');
+                if (editorDeleteBtnLocal) editorDeleteBtnLocal.disabled = false;
+            } catch (err) {
+                /* ignore */
+            }
+        }
+
+        function closeEditorModal() {
+            editorModal.classList.remove('active');
+            editorModal.style.display = 'none';
+            currentEditingSection = null;
+            currentEditingElement = null;
+            // disable delete button when modal closes
+            try {
+                const editorDeleteBtnLocal = document.getElementById('editor-delete-btn');
+                if (editorDeleteBtnLocal) editorDeleteBtnLocal.disabled = true;
+            } catch (err) {
+                /* ignore */
+            }
+        }
+
+        // Editor form submit
+        if (editorForm) {
+            editorForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if (!currentEditingSection || !currentEditingElement) return;
+
+                // Update section data (ID is read-only, skip updating)
+                // currentEditingSection.id = document.getElementById('edit-id').value;
+                currentEditingSection.name = document.getElementById('edit-name').value;
+                currentEditingSection.shape = document.getElementById('edit-shape').value;
+                currentEditingSection.position.x = document.getElementById('edit-x').value;
+                currentEditingSection.position.y = document.getElementById('edit-y').value;
+                currentEditingSection.size.width = document.getElementById('edit-width').value;
+                currentEditingSection.size.height = document.getElementById('edit-height').value;
+                currentEditingSection.startTime = parseFloat(document.getElementById('edit-start').value);
+                currentEditingSection.endTime = parseFloat(document.getElementById('edit-end').value);
+                currentEditingSection.color = document.getElementById('edit-color').value;
+                currentEditingSection.transparency = parseFloat(document.getElementById('edit-transparency').value);
+                currentEditingSection.borderColor = document.getElementById('edit-border-color').value;
+                currentEditingSection.borderWidth = parseInt(document.getElementById('edit-border-width').value);
+                currentEditingSection.borderRadius = parseInt(document.getElementById('edit-border-radius').value);
+
+                // Update element styles
+                currentEditingElement.dataset.sectionId = currentEditingSection.id;
+                currentEditingElement.style.left = currentEditingSection.position.x;
+                currentEditingElement.style.top = currentEditingSection.position.y;
+                currentEditingElement.style.width = currentEditingSection.size.width;
+                currentEditingElement.style.height = currentEditingSection.size.height;
+                currentEditingElement.style.backgroundColor = hexToRgba(currentEditingSection.color, currentEditingSection.transparency);
+                currentEditingElement.style.borderColor = currentEditingSection.borderColor;
+                currentEditingElement.style.borderWidth = currentEditingSection.borderWidth + 'px';
+                // Apply shape
+                if (currentEditingSection.shape === 'circle' || currentEditingSection.shape === 'ellipse') {
+                    currentEditingElement.style.borderRadius = '50%';
+                } else {
+                    currentEditingElement.style.borderRadius = currentEditingSection.borderRadius + 'px';
+                }
+                currentEditingElement.title = currentEditingSection.name || currentEditingSection.id;
+
+                // Show saving feedback
+                const submitBtn = editorForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Saving...';
+
+                // Persist changes to server immediately
+                (async () => {
+                    try {
+                        const saved = await saveSections();
+                        if (saved) {
+                            submitBtn.textContent = 'Saved!';
+                            setTimeout(() => {
+                                closeEditorModal();
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = originalText;
+                                // Exit edit mode after saving
+                                exitEditMode();
+                            }, 500);
+                        } else {
+                            alert('Failed to save section changes to server.');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalText;
+                        }
+                    } catch (err) {
+                        console.error('Save error:', err);
+                        alert('Error saving: ' + err.message);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                })();
+            });
+        } else {
+            console.error('Editor form not found!');
+        }
+
+        // Editor cancel button
+        const cancelBtn = document.getElementById('editor-cancel');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Cancel button clicked');
+                closeEditorModal();
+            });
+        } else {
+            console.error('Cancel button not found!');
+        }
+
+        // Editor Add/Delete buttons inside modal
+        const editorAddBtn = document.getElementById('editor-add-btn');
+        const editorDeleteBtn = document.getElementById('editor-delete-btn');
+
+        if (editorAddBtn) {
+            editorAddBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Generate next sequential integer ID
+                const nextId = getNextSequentialId();
+                // create default section placed at center-bottom
+                const newSection = {
+                    id: nextId.toString(),
+                    name: 'New Section',
+                    shape: 'rectangle',
+                    startTime: 0,
+                    endTime: 10,
+                    color: '#ffffff',
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    transparency: 0.3,
+                    position: { x: '10%', y: '10%' },
+                    size: { width: '30%', height: '15%' }
+                };
+                sectionsData.push(newSection);
+                // Rebuild rectangles
+                initializeHighlights();
+
+                // Helper to find the newly created rectangle with retries
+                let attempts = 0;
+                function tryFindNew() {
+                    attempts++;
+                    const nl = highlightRectangles.find(h => h.section.id === newSection.id);
+                    if (nl) {
+                        openEditorModal(newSection, nl.element);
+                        selectedRect = { element: nl.element, section: newSection };
+                        if (editorDeleteBtn) editorDeleteBtn.disabled = false;
+                        // ensure the rect is visible for editing
+                        nl.element.style.display = 'block';
+                        return;
+                    }
+                    if (attempts < 6) {
+                        // try again shortly (handles small rendering delays)
+                        setTimeout(tryFindNew, 50);
+                    } else {
+                        console.warn('New section element not found after initializeHighlights');
+                    }
+                }
+                tryFindNew();
+            });
+        }
+
+        if (editorDeleteBtn) {
+            editorDeleteBtn.disabled = true; // initially disabled
+            editorDeleteBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                // If modal is editing a specific section, prefer that
+                const targetSection = currentEditingSection || (selectedRect && selectedRect.section);
+                if (!targetSection) {
+                    alert('No section selected to delete.');
+                    return;
+                }
+                if (!confirm(`Are you sure you want to delete the section "${targetSection.name || targetSection.id}"?`)) return;
+
+                // Store the section name for feedback
+                const deletedName = targetSection.name || targetSection.id;
+
+                // Remove from sectionsData
+                const index = sectionsData.findIndex(s => s.id === targetSection.id);
+                if (index !== -1) sectionsData.splice(index, 1);
+
+                // Remove DOM element
+                const rectIndex = highlightRectangles.findIndex(r => r.section.id === targetSection.id);
+                if (rectIndex !== -1) {
+                    const el = highlightRectangles[rectIndex].element;
+                    if (el && el.parentNode) el.parentNode.removeChild(el);
+                    highlightRectangles.splice(rectIndex, 1);
+                }
+
+                // Clear selection and close modal if it was open for this section
+                if (currentEditingSection && currentEditingSection.id === targetSection.id) {
+                    closeEditorModal();
+                }
+                if (selectedRect && selectedRect.section && selectedRect.section.id === targetSection.id) {
+                    selectedRect = null;
+                }
+
+                // disable delete until another selection
+                editorDeleteBtn.disabled = true;
+
+                // Auto-save the changes to database
+                console.log('Section deleted, auto-saving to database...');
+                try {
+                    const saved = await saveSections();
+                    if (saved) {
+                        console.log('Section deleted and saved successfully');
+                    } else {
+                        alert('Section deleted from view but failed to save. Changes may not persist.');
+                    }
+                } catch (err) {
+                    console.error('Error saving after delete:', err);
+                    alert('Section deleted from view but save failed: ' + err.message);
+                }
+            });
+        }
+
+        // Close modal on backdrop click
+        if (editorModal) {
+            editorModal.addEventListener('click', (e) => {
+                if (e.target === editorModal) {
+                    closeEditorModal();
+                }
+            });
+        }
+
+        // Live preview: update rectangle while editing form inputs
+        function attachLivePreviewListeners() {
+            const inputs = {
+                id: document.getElementById('edit-id'),
+                name: document.getElementById('edit-name'),
+                shape: document.getElementById('edit-shape'),
+                x: document.getElementById('edit-x'),
+                y: document.getElementById('edit-y'),
+                width: document.getElementById('edit-width'),
+                height: document.getElementById('edit-height'),
+                start: document.getElementById('edit-start'),
+                end: document.getElementById('edit-end'),
+                color: document.getElementById('edit-color'),
+                transparency: document.getElementById('edit-transparency'),
+                borderColor: document.getElementById('edit-border-color'),
+                borderWidth: document.getElementById('edit-border-width'),
+                borderRadius: document.getElementById('edit-border-radius')
+            };
+
+            Object.keys(inputs).forEach(key => {
+                const el = inputs[key];
+                if (!el) {
+                    console.warn(`Input not found for: ${key}`);
+                    return;
+                }
+
+                el.addEventListener('input', () => {
+                    // Use currentEditingSection and currentEditingElement which are set when modal opens
+                    if (!currentEditingSection || !currentEditingElement) {
+                        console.log('No current editing context for live preview');
+                        return;
+                    }
+
+                    console.log(`Live preview: ${key} = ${el.value}`);
+
+                    try {
+                        switch (key) {
+                            case 'id':
+                                const newId = el.value || currentEditingSection.id;
+                                currentEditingSection.id = newId;
+                                currentEditingElement.dataset.sectionId = newId;
+                                break;
+                            case 'name':
+                                currentEditingSection.name = el.value;
+                                currentEditingElement.title = el.value || currentEditingSection.id;
+                                break;
+                            case 'shape':
+                                currentEditingSection.shape = el.value;
+                                // Apply shape immediately
+                                if (el.value === 'circle' || el.value === 'ellipse') {
+                                    currentEditingElement.style.borderRadius = '50%';
+                                    // Disable border radius input
+                                    const borderRadiusInput = document.getElementById('edit-border-radius');
+                                    if (borderRadiusInput) {
+                                        borderRadiusInput.disabled = true;
+                                        borderRadiusInput.style.opacity = '0.5';
+                                        borderRadiusInput.style.cursor = 'not-allowed';
+                                    }
+                                } else {
+                                    currentEditingElement.style.borderRadius = (currentEditingSection.borderRadius || 4) + 'px';
+                                    // Enable border radius input
+                                    const borderRadiusInput = document.getElementById('edit-border-radius');
+                                    if (borderRadiusInput) {
+                                        borderRadiusInput.disabled = false;
+                                        borderRadiusInput.style.opacity = '1';
+                                        borderRadiusInput.style.cursor = 'text';
+                                    }
+                                }
+                                break;
+                            case 'x':
+                                currentEditingSection.position.x = el.value;
+                                currentEditingElement.style.left = el.value;
+                                break;
+                            case 'y':
+                                currentEditingSection.position.y = el.value;
+                                currentEditingElement.style.top = el.value;
+                                break;
+                            case 'width':
+                                currentEditingSection.size.width = el.value;
+                                currentEditingElement.style.width = el.value;
+                                break;
+                            case 'height':
+                                currentEditingSection.size.height = el.value;
+                                currentEditingElement.style.height = el.value;
+                                break;
+                            case 'start':
+                                currentEditingSection.startTime = parseFloat(el.value) || 0;
+                                break;
+                            case 'end':
+                                currentEditingSection.endTime = parseFloat(el.value) || 0;
+                                break;
+                            case 'color':
+                                currentEditingSection.color = el.value;
+                                currentEditingElement.style.backgroundColor = hexToRgba(currentEditingSection.color, currentEditingSection.transparency);
+                                // Update hex display field
+                                const colorHexField = document.getElementById('edit-color-hex');
+                                if (colorHexField) colorHexField.value = el.value;
+                                break;
+                            case 'transparency':
+                                currentEditingSection.transparency = parseFloat(el.value) || 0;
+                                currentEditingElement.style.backgroundColor = hexToRgba(currentEditingSection.color, currentEditingSection.transparency);
+                                break;
+                            case 'borderColor':
+                                currentEditingSection.borderColor = el.value;
+                                currentEditingElement.style.borderColor = el.value;
+                                // Update hex display field
+                                const borderColorHexField = document.getElementById('edit-border-color-hex');
+                                if (borderColorHexField) borderColorHexField.value = el.value;
+                                break;
+                            case 'borderWidth':
+                                currentEditingSection.borderWidth = parseInt(el.value) || 0;
+                                currentEditingElement.style.borderWidth = (currentEditingSection.borderWidth || 0) + 'px';
+                                break;
+                            case 'borderRadius':
+                                currentEditingSection.borderRadius = parseInt(el.value) || 0;
+                                // Only apply if not circle shape
+                                if (currentEditingSection.shape !== 'circle' && currentEditingSection.shape !== 'ellipse') {
+                                    currentEditingElement.style.borderRadius = (currentEditingSection.borderRadius || 0) + 'px';
+                                }
+                                break;
+                        }
+                    } catch (err) {
+                        console.error('Live preview error for', key, ':', err);
+                    }
+                });
+            });
+
+            console.log('Live preview listeners attached');
+        }
+
+        // Call once to set up listeners
+        attachLivePreviewListeners();
+
+        function hexToRgba(hex, alpha) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        // Ensure color is in proper hex format (#RRGGBB)
+        function ensureHexColor(color) {
+            if (!color) return '#000000';
+            // If already in hex format, return as is
+            if (color.startsWith('#') && (color.length === 7 || color.length === 4)) {
+                // Convert 3-digit hex to 6-digit
+                if (color.length === 4) {
+                    return '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+                }
+                return color;
+            }
+            // If rgb/rgba format, convert to hex
+            if (color.startsWith('rgb')) {
+                const match = color.match(/\d+/g);
+                if (match && match.length >= 3) {
+                    const r = parseInt(match[0]).toString(16).padStart(2, '0');
+                    const g = parseInt(match[1]).toString(16).padStart(2, '0');
+                    const b = parseInt(match[2]).toString(16).padStart(2, '0');
+                    return '#' + r + g + b;
+                }
+            }
+            // Default to black if unable to parse
+            return '#000000';
+        }
+
+        // Generate next sequential integer ID
+        function getNextSequentialId() {
+            if (sectionsData.length === 0) return 1;
+            // Find the highest numeric ID
+            const numericIds = sectionsData
+                .map(s => parseInt(s.id))
+                .filter(id => !isNaN(id));
+            if (numericIds.length === 0) return 1;
+            return Math.max(...numericIds) + 1;
+        }
+
+        function updateHighlights(currentTime) {
+            highlightRectangles.forEach(({ element, section }) => {
+                if (currentTime >= section.startTime && currentTime < section.endTime) {
+                    element.style.display = 'block';
+                } else {
+                    element.style.display = 'none';
+                }
+            });
+        }
+
+        function clearAllHighlights() {
+            highlightRectangles.forEach(({ element }) => {
+                element.style.display = 'none';
+            });
+        }
+
+        // Update highlights on timeupdate
+        audio.addEventListener('timeupdate', () => {
+            updateHighlights(audio.currentTime);
+        });
+
+        // Load sections on page load
+        console.log('=== Admin Page Loaded ===');
+        console.log('posterImage:', posterImage);
+        console.log('editorModal:', editorModal);
+        console.log('editorForm:', editorForm);
+
+        if (posterImage) {
+            console.log('Loading sections...');
+            loadSections();
+        } else {
+            console.error('No poster image found!');
+        }
+
+        // QR Modal (header button + share + download)
+        const headerQrBtn = document.getElementById('header-qr-btn');
+        const modal = document.getElementById('qr-modal');
+        const closeBtn = document.querySelector('.close');
+        const shareBtn = document.getElementById('share-btn');
+        const downloadBtn = document.getElementById('download-btn');
+
+        function openModal() { if (modal) modal.style.display = 'flex'; }
+        function closeModal() { if (modal) modal.style.display = 'none'; }
+
+        if (headerQrBtn) headerQrBtn.addEventListener('click', openModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        // Download QR code
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', async () => {
+                try {
+                    const qrImage = document.querySelector('.modal-qr');
+                    if (!qrImage) {
+                        alert('QR code image not found');
+                        return;
+                    }
+
+                    // Fetch the QR image as a blob
+                    const response = await fetch(qrImage.src);
+                    const blob = await response.blob();
+
+                    // Create download link
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'qr-code.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+
+                    // Visual feedback
+                    const original = downloadBtn.innerHTML;
+                    downloadBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Downloaded!</span>';
+                    setTimeout(() => { downloadBtn.innerHTML = original; }, 1500);
+                } catch (err) {
+                    console.error('Download failed:', err);
+                    alert('Failed to download QR code');
+                }
+            });
+        }
+
+        if (shareBtn) {
+            shareBtn.addEventListener('click', async () => {
+                const posterUrl = `${window.location.origin}/poster/${POSTER_ID}`;
+                const shareData = { title: document.title, text: 'Scan this QR to open the poster', url: posterUrl };
+                try {
+                    if (navigator.share) {
+                        await navigator.share(shareData);
+                    } else if (navigator.clipboard) {
+                        await navigator.clipboard.writeText(posterUrl);
+                        const original = shareBtn.innerHTML;
+                        shareBtn.innerHTML = 'Copied!';
+                        setTimeout(() => { shareBtn.innerHTML = original; }, 1500);
+                    } else {
+                        // fallback: create temporary input
+                        const tmp = document.createElement('input');
+                        tmp.value = posterUrl;
+                        document.body.appendChild(tmp);
+                        tmp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(tmp);
+                        const original = shareBtn.innerHTML;
+                        shareBtn.innerHTML = 'Copied!';
+                        setTimeout(() => { shareBtn.innerHTML = original; }, 1500);
+                    }
+                } catch (err) {
+                    console.error('Share failed', err);
+                }
+            });
+        }
+
+        // Admin editing functionality
+        let isEditing = false;
+        let selectedRect = null;
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let isResizing = false;
+        let resizeHandle = null;
+
+        // Function to exit edit mode
+        function exitEditMode() {
+            const editBtn = document.getElementById('edit-btn');
+            if (!editBtn) return;
+
+            isEditing = false;
+            editBtn.textContent = 'Edit Sections';
+            editBtn.classList.remove('editing');
+
+            // Hide resize handles and edit buttons
+            highlightRectangles.forEach(({ element }) => {
+                element.querySelectorAll('.resize-handle').forEach(handle => {
+                    handle.style.display = 'none';
+                });
+                const sectionEditBtn = element.querySelector('.section-edit-btn');
+                if (sectionEditBtn) sectionEditBtn.classList.remove('visible');
+            });
+
+            // Hide rectangles that aren't active
+            updateHighlights(audio.currentTime);
+
+            // Disable delete button and clear selection
+            const editorDelete = document.getElementById('editor-delete-btn');
+            if (editorDelete) {
+                editorDelete.disabled = true;
+            }
+
+            // Clear selection
+            if (selectedRect) {
+                selectedRect.element.style.zIndex = '';
+                selectedRect = null;
+            }
+
+            // Close modal if open
+            closeEditorModal();
+        }
+
+        // Save sections configuration
+        async function saveSections() {
+            try {
+                const response = await fetch(`/api/sections?poster_id=${POSTER_ID}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ sections: sectionsData })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Sections saved successfully');
+                    return true;
+                } else {
+                    console.error('Failed to save sections:', result.error);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Failed to save sections:', error);
+                return false;
+            }
+        }
+
+        function makeRectanglesEditable() {
+            highlightRectangles.forEach(({ element, section }) => {
+                element.style.cursor = 'move';
+
+                // Remove existing listeners to avoid duplicates
+                const newElement = element.cloneNode(true);
+                element.parentNode.replaceChild(newElement, element);
+                const updatedRect = highlightRectangles.find(r => r.section.id === section.id);
+                if (updatedRect) updatedRect.element = newElement;
+
+                newElement.addEventListener('mousedown', (e) => {
+                    if (!isEditing) return;
+                    if (e.target.classList.contains('resize-handle')) return;
+                    // Don't start drag if clicking on edit button or its children
+                    if (e.target.classList.contains('section-edit-btn') ||
+                        e.target.closest('.section-edit-btn')) {
+                        return;
+                    }
+                    e.stopPropagation();
+                    selectedRect = { element: newElement, section };
+                    const editorDelete = document.getElementById('editor-delete-btn');
+                    if (editorDelete) editorDelete.disabled = false;
+                    const rect = newElement.getBoundingClientRect();
+                    dragOffset.x = e.clientX - rect.left;
+                    dragOffset.y = e.clientY - rect.top;
+                    isDragging = true;
+                    newElement.style.zIndex = '1000';
+                });
+
+                // Re-attach edit button click listener after cloning
+                const editButton = newElement.querySelector('.section-edit-btn');
+                if (editButton) {
+                    editButton.addEventListener('click', (e) => {
+                        console.log('Edit button clicked (after clone) for section:', section.id);
+                        e.stopPropagation();
+                        e.preventDefault();
+                        try {
+                            openEditorModal(section, newElement);
+                        } catch (err) {
+                            console.error('Error opening modal:', err);
+                            alert('Error: ' + err.message);
+                        }
+                    });
+                }
+
+                // Re-attach rectangle click listener
+                newElement.addEventListener('click', (e) => {
+                    console.log('Rectangle clicked (after clone) for section:', section.id);
+                    if (!isEditing) return;
+                    // Don't open editor if clicking edit button or resize handle
+                    if (e.target.classList.contains('section-edit-btn') ||
+                        e.target.closest('.section-edit-btn') ||
+                        e.target.classList.contains('resize-handle')) {
+                        return;
+                    }
+                    e.stopPropagation();
+                    e.preventDefault();
+                    try {
+                        openEditorModal(section, newElement);
+                    } catch (err) {
+                        console.error('Error opening modal from rect click:', err);
+                    }
+                });
+
+                // Setup resize handles
+                const handles = ['nw', 'ne', 'sw', 'se'];
+                handles.forEach(handle => {
+                    const handleEl = newElement.querySelector(`.resize-${handle}`);
+                    if (handleEl) {
+                        handleEl.addEventListener('mousedown', (e) => {
+                            if (!isEditing) return;
+                            e.stopPropagation();
+                            isResizing = true;
+                            resizeHandle = handle;
+                            selectedRect = { element: newElement, section };
+                        });
+                    }
+                });
+            });
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isEditing || !selectedRect) return;
+
+            const overlayRect = highlightOverlay.getBoundingClientRect();
+            const overlayWidth = overlayRect.width;
+            const overlayHeight = overlayRect.height;
+
+            if (isDragging) {
+                const x = (e.clientX - overlayRect.left) - dragOffset.x;
+                const y = (e.clientY - overlayRect.top) - dragOffset.y;
+
+                // Calculate percentages
+                const xPercent = (x / overlayWidth * 100).toFixed(1) + '%';
+                const yPercent = (y / overlayHeight * 100).toFixed(1) + '%';
+
+                selectedRect.element.style.left = xPercent;
+                selectedRect.element.style.top = yPercent;
+                selectedRect.section.position.x = xPercent;
+                selectedRect.section.position.y = yPercent;
+            } else if (isResizing) {
+                const rect = selectedRect.element.getBoundingClientRect();
+                const currentX = rect.left - overlayRect.left;
+                const currentY = rect.top - overlayRect.top;
+                const currentWidth = rect.width;
+                const currentHeight = rect.height;
+
+                let newX = currentX, newY = currentY, newWidth = currentWidth, newHeight = currentHeight;
+
+                if (resizeHandle.includes('e')) {
+                    newWidth = (e.clientX - overlayRect.left) - currentX;
+                }
+                if (resizeHandle.includes('w')) {
+                    newWidth = currentX + currentWidth - (e.clientX - overlayRect.left);
+                    newX = (e.clientX - overlayRect.left);
+                }
+                if (resizeHandle.includes('s')) {
+                    newHeight = (e.clientY - overlayRect.top) - currentY;
+                }
+                if (resizeHandle.includes('n')) {
+                    newHeight = currentY + currentHeight - (e.clientY - overlayRect.top);
+                    newY = (e.clientY - overlayRect.top);
+                }
+
+                if (newWidth > 20 && newHeight > 20) {
+                    // Calculate percentages
+                    const xPercent = (newX / overlayWidth * 100).toFixed(1) + '%';
+                    const yPercent = (newY / overlayHeight * 100).toFixed(1) + '%';
+                    const widthPercent = (newWidth / overlayWidth * 100).toFixed(1) + '%';
+                    const heightPercent = (newHeight / overlayHeight * 100).toFixed(1) + '%';
+
+                    selectedRect.element.style.left = xPercent;
+                    selectedRect.element.style.top = yPercent;
+                    selectedRect.element.style.width = widthPercent;
+                    selectedRect.element.style.height = heightPercent;
+                    selectedRect.section.position.x = xPercent;
+                    selectedRect.section.position.y = yPercent;
+                    selectedRect.section.size.width = widthPercent;
+                    selectedRect.section.size.height = heightPercent;
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            isResizing = false;
+            resizeHandle = null;
+            if (selectedRect) {
+                selectedRect.element.style.zIndex = '';
+            }
+        });
+
+        const editBtn = document.getElementById('edit-btn');
+        if (editBtn) {
+            editBtn.addEventListener('click', () => {
+                console.log('Edit Sections button clicked. Current isEditing:', isEditing);
+                isEditing = !isEditing;
+                console.log('New isEditing:', isEditing);
+                if (isEditing) {
+                    // Pause audio if playing and reset to beginning
+                    const audioEl = document.getElementById('audio');
+                    const playBtn = document.getElementById('play-btn');
+                    if (audioEl && !audioEl.paused) {
+                        audioEl.pause();
+                        audioEl.currentTime = 0;
+                        if (playBtn) {
+                            playBtn.textContent = 'Play';
+                            playBtn.classList.remove('playing');
+                        }
+                        // Clear all highlights
+                        clearAllHighlights();
+                    } else if (audioEl) {
+                        // Even if not playing, reset to beginning
+                        audioEl.currentTime = 0;
+                    }
+
+                    editBtn.textContent = 'Edit Sections';
+                    editBtn.classList.add('editing');
+                    // Show all rectangles for editing
+                    highlightRectangles.forEach(({ element }) => {
+                        element.style.display = 'block';
+                        element.style.pointerEvents = 'auto';
+                        // Show resize handles and edit button
+                        element.querySelectorAll('.resize-handle').forEach(handle => {
+                            handle.style.display = 'block';
+                        });
+                        const sectionEditBtn = element.querySelector('.section-edit-btn');
+                        if (sectionEditBtn) sectionEditBtn.classList.add('visible');
+                    });
+                    makeRectanglesEditable();
+                    // Open the editor modal for the first section (or create one if none)
+                    let sectionToEdit = null;
+                    let elementToEdit = null;
+                    if (highlightRectangles.length > 0) {
+                        sectionToEdit = highlightRectangles[0].section;
+                        elementToEdit = highlightRectangles[0].element;
+                    } else {
+                        // No sections exist, create one and open modal
+                        const nextId = getNextSequentialId();
+                        const newSection = {
+                            id: nextId.toString(),
+                            name: 'New Section',
+                            shape: 'rectangle',
+                            startTime: 0,
+                            endTime: 10,
+                            color: '#ffffff',
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            transparency: 0.3,
+                            position: { x: '10%', y: '10%' },
+                            size: { width: '30%', height: '15%' }
+                        };
+                        sectionsData.push(newSection);
+                        initializeHighlights();
+                        const nl = highlightRectangles.find(h => h.section.id === newSection.id);
+                        if (nl) {
+                            sectionToEdit = nl.section;
+                            elementToEdit = nl.element;
+                        }
+                    }
+                    if (sectionToEdit && elementToEdit) {
+                        openEditorModal(sectionToEdit, elementToEdit);
+                        selectedRect = { element: elementToEdit, section: sectionToEdit };
+                        const editorDelete = document.getElementById('editor-delete-btn');
+                        if (editorDelete) editorDelete.disabled = false;
+                    }
+                } else {
+                    // Exit edit mode
+                    exitEditMode();
+                }
+            });
+        }
+
+
+
+        // Logout button
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    await fetch('/admin/logout', { method: 'POST' });
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Logout failed:', error);
+                }
+            });
+        }
+
+        // Music Upload Modal
+        const musicBtn = document.getElementById('music-btn');
+        const musicModal = document.getElementById('music-modal');
+        const musicForm = document.getElementById('music-form');
+        const currentMusicName = document.getElementById('current-music-name');
+
+        function openMusicModal() {
+            if (musicModal) {
+                musicModal.classList.add('active');
+                musicModal.style.display = 'flex';
+                // Get current music info
+                updateCurrentMusicInfo();
+            }
+        }
+
+        function closeMusicModal() {
+            if (musicModal) {
+                musicModal.classList.remove('active');
+                musicModal.style.display = 'none';
+                // Reset form
+                if (musicForm) musicForm.reset();
+            }
+        }
+
+        async function updateCurrentMusicInfo() {
+            try {
+                const audioEl = document.getElementById('audio');
+                if (audioEl && audioEl.src) {
+                    const srcUrl = new URL(audioEl.src);
+                    const pathParts = srcUrl.pathname.split('/');
+                    const filename = pathParts[pathParts.length - 1] || 'music.mp3';
+                    if (currentMusicName) {
+                        currentMusicName.textContent = filename;
+                    }
+                }
+            } catch (err) {
+                console.error('Error getting music info:', err);
+                if (currentMusicName) currentMusicName.textContent = 'Unknown';
+            }
+        }
+
+        if (musicBtn) {
+            musicBtn.addEventListener('click', () => {
+                openMusicModal();
+            });
+        }
+
+        if (musicModal) {
+            musicModal.addEventListener('click', (e) => {
+                if (e.target === musicModal) {
+                    closeMusicModal();
+                }
+            });
+        }
+
+        if (musicForm) {
+            musicForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const fileInput = document.getElementById('music-file');
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    alert('Please select an audio file');
+                    return;
+                }
+
+                // Validate file size (max 50MB)
+                if (file.size > 50 * 1024 * 1024) {
+                    alert('File is too large. Maximum size is 50MB');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('music', file);
+                formData.append('poster_id', POSTER_ID);
+
+                const submitBtn = musicForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Uploading...';
+
+                try {
+                    const response = await fetch('/admin/upload-music', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        submitBtn.textContent = 'Uploaded!';
+                        setTimeout(() => {
+                            closeMusicModal();
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = originalText;
+                            // Reload audio
+                            const audioEl = document.getElementById('audio');
+                            if (audioEl) {
+                                audioEl.src = result.music_url + '?t=' + new Date().getTime();
+                                audioEl.load();
+                            }
+                            alert('Music uploaded successfully! The page will refresh.');
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        alert('Upload failed: ' + (result.error || 'Unknown error'));
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = originalText;
+                    }
+                } catch (err) {
+                    console.error('Upload error:', err);
+                    alert('Upload failed: ' + err.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+            });
+        }
+    </script>
+
+    <footer class="site-footer">
+        <div class="container">
+            <small>&lt;/&gt; Developed by <a href="https://himanshu-portfolio-beryl.vercel.app/" target="_blank"
+                    rel="noopener noreferrer">Himanshu Fanibhare</a></small>
+        </div>
+    </footer>
+</body>
+
+</html>

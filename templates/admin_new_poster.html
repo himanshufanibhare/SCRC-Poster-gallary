@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Add New Poster - Admin</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container header-row">
+            <div>
+                <h1 class="site-title">Add New Poster</h1>
+                <p class="site-sub">Upload poster image and music</p>
+            </div>
+            <div>
+                <a href="/admin/dashboard" class="header-qr-btn" title="Back to Dashboard">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main">
+        <section class="card">
+            <form id="new-poster-form" class="poster-form" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="poster-name">Poster Name *</label>
+                    <input type="text" id="poster-name" name="name" required placeholder="e.g., SCRC Architecture" />
+                </div>
+
+                <div class="form-group">
+                    <label for="poster-id">Poster ID * <small>(lowercase, hyphens, no spaces)</small></label>
+                    <input type="text" id="poster-id" name="id" required placeholder="e.g., scrc-architecture"
+                        pattern="[a-z0-9-]+" />
+                </div>
+
+                <div class="form-group">
+                    <label for="poster-description">Description</label>
+                    <textarea id="poster-description" name="description" rows="3"
+                        placeholder="Brief description of the poster"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="poster-image">Poster Image * <small>(PNG, JPG, or PDF)</small></label>
+                    <input type="file" id="poster-image" name="image" accept="image/png,image/jpeg,application/pdf"
+                        required />
+                    <div id="image-preview" class="file-preview"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="poster-music">Music File * <small>(MP3)</small></label>
+                    <input type="file" id="poster-music" name="music" accept="audio/mp3,audio/mpeg" required />
+                    <div id="music-preview" class="file-preview"></div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Create Poster & Edit Sections</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('new-poster-form');
+        const nameInput = document.getElementById('poster-name');
+        const idInput = document.getElementById('poster-id');
+        const imageInput = document.getElementById('poster-image');
+        const musicInput = document.getElementById('poster-music');
+        const imagePreview = document.getElementById('image-preview');
+        const musicPreview = document.getElementById('music-preview');
+
+        // Auto-generate ID from name
+        nameInput.addEventListener('input', () => {
+            if (!idInput.value || idInput.dataset.auto) {
+                const autoId = nameInput.value.toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+                idInput.value = autoId;
+                idInput.dataset.auto = 'true';
+            }
+        });
+
+        idInput.addEventListener('input', () => {
+            delete idInput.dataset.auto;
+        });
+
+        // Image preview
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                imagePreview.innerHTML = `<span>✓ Selected: ${file.name}</span>`;
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px;" /><br><span>${file.name}</span>`;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+        // Music preview
+        musicInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                musicPreview.innerHTML = `<span>✓ Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)</span>`;
+            }
+        });
+
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating poster...';
+
+            try {
+                const response = await fetch('/admin/poster/create', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Poster created successfully!');
+                    window.location.href = `/admin/poster/${result.poster_id}/edit`;
+                } else {
+                    alert('Failed to create poster: ' + result.error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Poster & Edit Sections';
+                }
+            } catch (error) {
+                alert('Error creating poster: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Poster & Edit Sections';
+            }
+        });
+    </script>
+
+    <footer class="site-footer">
+        <div class="container">
+            <small>&lt;/&gt; Developed by <a href="https://himanshu-portfolio-beryl.vercel.app/" target="_blank"
+                    rel="noopener noreferrer">Himanshu Fanibhare</a></small>
+        </div>
+    </footer>
+</body>
+
+</html>
