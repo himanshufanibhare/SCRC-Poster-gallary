@@ -73,7 +73,7 @@ def get_poster_by_id(poster_id):
 def generate_qr_for_poster(poster_id):
     """Generate QR code for specific poster"""
     local_ip = get_local_ip()
-    url = f"http://{local_ip}:{PORT}/poster/{poster_id}"
+    url = f"https://{local_ip}:{PORT}/poster/{poster_id}"
     
     try:
         qr = qrcode.make(url)
