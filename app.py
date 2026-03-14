@@ -20,13 +20,16 @@ QR_FOLDER = os.path.join(STATIC_FOLDER, "qr")
 JSON_FOLDER = os.path.join(STATIC_FOLDER, "json")
 
 MUSIC_FILE = "music.mp3"
-PORT = int(os.environ.get("PORT", 5000))
+PORT = int(os.environ.get("PORT", 8940))
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")  # Change this!
 POSTERS_FILE = os.path.join(JSON_FOLDER, "posters.json")
 UPLOAD_FOLDER = STATIC_FOLDER
 
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'pdf'}
 ALLOWED_AUDIO_EXTENSIONS = {'mp3', 'mpeg', 'wav', 'ogg', 'm4a', 'aac'}
+
+# Hardcoded URL prefix for reverse proxy
+URL_PREFIX = "/posters"
 
 # Create folders on startup
 for folder in [STATIC_FOLDER, POSTERS_FOLDER, MUSIC_FOLDER, QR_FOLDER, JSON_FOLDER]:
@@ -99,7 +102,7 @@ def get_local_ip():
     return ip
 
 
-@app.route("/")
+@app.route(f"{URL_PREFIX}/")
 def index():
     """Show gallery of all posters"""
     posters_data = load_posters()
@@ -108,7 +111,8 @@ def index():
     return render_template('gallery.html', posters=posters)
 
 
-@app.route("/poster/<poster_id>")
+# Correct the URL generation for poster links
+@app.route(f"{URL_PREFIX}/<poster_id>")
 def view_poster(poster_id):
     """View a specific poster (public)"""
     poster = get_poster_by_id(poster_id)
@@ -123,10 +127,11 @@ def view_poster(poster_id):
                          qr_path=qr_path, 
                          poster_img=poster_img,
                          poster=poster,
-                         music_file=music_file)
+                         music_file=music_file,
+                         URL_PREFIX=URL_PREFIX)
 
 
-@app.route('/poster/<poster_id>/qr')
+@app.route(f"{URL_PREFIX}/<poster_id>/qr")
 def poster_qr(poster_id):
     """Generate or return QR image for a poster (returns JSON with url)
        Generates the QR file on demand and returns its static URL so gallery can display it."""
@@ -150,7 +155,7 @@ def poster_qr(poster_id):
     return jsonify({'qr_url': qr_url})
 
 
-@app.route("/music/<poster_id>")
+@app.route(f"{URL_PREFIX}/music/<poster_id>")
 def poster_music(poster_id):
     """Serve music for specific poster"""
     poster = get_poster_by_id(poster_id)
@@ -177,40 +182,40 @@ def poster_music(poster_id):
     return "Music file not found", 404
 
 
-@app.route("/music.mp3")
+@app.route(f"{URL_PREFIX}/music.mp3")
 def music():
     """Legacy music endpoint"""
     return send_file(MUSIC_FILE, mimetype="audio/mpeg")
 
 
-@app.route("/admin")
+# Update redirect URLs to use URL_PREFIX
+@app.route(f"{URL_PREFIX}/admin")
 def admin():
     """Admin login page"""
     if not session.get('authenticated'):
         return render_template('admin_login.html')
-    return redirect('/admin/dashboard')
+    return redirect(f"{URL_PREFIX}/admin/dashboard")
 
-
-@app.route("/admin/dashboard")
+@app.route(f"{URL_PREFIX}/admin/dashboard")
 def admin_dashboard():
     """Admin dashboard - requires authentication"""
     if not session.get('authenticated'):
-        return redirect('/admin')
+        return redirect(f"{URL_PREFIX}/admin")
     
     posters_data = load_posters()
     return render_template('admin_dashboard.html', posters=posters_data.get("posters", []))
 
 
-@app.route("/admin/poster/new")
+@app.route(f"{URL_PREFIX}/admin/poster/new")
 def admin_new_poster():
     """New poster form - requires authentication"""
     if not session.get('authenticated'):
-        return redirect('/admin')
+        return redirect(f"{URL_PREFIX}/admin")
     
     return render_template('admin_new_poster.html')
 
 
-@app.route("/admin/poster/create", methods=["POST"])
+@app.route(f"{URL_PREFIX}/admin/poster/create", methods=["POST"])
 def admin_create_poster():
     """Create new poster - requires authentication"""
     if not session.get('authenticated'):
@@ -293,11 +298,11 @@ def admin_create_poster():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/admin/poster/<poster_id>/edit")
+@app.route(f"{URL_PREFIX}/admin/poster/<poster_id>/edit")
 def admin_edit_poster(poster_id):
     """Edit poster sections - requires authentication"""
     if not session.get('authenticated'):
-        return redirect('/admin')
+        return redirect(f"{URL_PREFIX}/admin")
     
     poster = get_poster_by_id(poster_id)
     if not poster:
@@ -313,7 +318,7 @@ def admin_edit_poster(poster_id):
                          poster_id=poster_id)
 
 
-@app.route("/admin/poster/<poster_id>/delete", methods=["POST"])
+@app.route(f"{URL_PREFIX}/admin/poster/<poster_id>/delete", methods=["POST"])
 def admin_delete_poster(poster_id):
     """Delete poster - requires authentication"""
     if not session.get('authenticated'):
@@ -351,7 +356,7 @@ def admin_delete_poster(poster_id):
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/admin/login", methods=["POST"])
+@app.route(f"{URL_PREFIX}/admin/login", methods=["POST"])
 def admin_login():
     """Authenticate admin"""
     password = request.form.get('password')
@@ -361,14 +366,14 @@ def admin_login():
     return jsonify({"success": False, "error": "Invalid password"}), 401
 
 
-@app.route("/admin/logout", methods=["POST"])
+@app.route(f"{URL_PREFIX}/admin/logout", methods=["POST"])
 def admin_logout():
     """Logout admin"""
     session.pop('authenticated', None)
     return jsonify({"success": True})
 
 
-@app.route("/admin/upload-music", methods=["POST"])
+@app.route(f"{URL_PREFIX}/admin/upload-music", methods=["POST"])
 def upload_music():
     """Upload music file for a poster"""
     if not session.get('authenticated'):
@@ -435,7 +440,7 @@ def upload_music():
         return jsonify({"success": False, "error": str(e)}), 500
 
 
-@app.route("/api/sections", methods=["GET"])
+@app.route(f"{URL_PREFIX}/api/sections", methods=["GET"])
 def get_sections():
     """Get sections configuration for a poster"""
     poster_id = request.args.get('poster_id', 'scrc-architecture')  # Default to legacy
@@ -458,7 +463,7 @@ def get_sections():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/sections", methods=["POST"])
+@app.route(f"{URL_PREFIX}/api/sections", methods=["POST"])
 def save_sections():
     """Save sections configuration - requires authentication"""
     if not session.get('authenticated'):
@@ -517,6 +522,17 @@ def convert_pdf_to_poster():
                 break
     except Exception as e:
         print(f"Failed to convert PDF: {e}")
+
+
+# Update templates to use URL_PREFIX dynamically
+@app.context_processor
+def inject_url_prefix():
+    """Inject URL_PREFIX into all templates"""
+    return dict(URL_PREFIX=URL_PREFIX)
+
+# Example usage in templates:
+# Use `{{ URL_PREFIX }}` to dynamically include the prefix in links
+# Example: <a href="{{ URL_PREFIX }}/admin">Admin Dashboard</a>
 
 
 if __name__ == "__main__":

@@ -60,7 +60,7 @@
                 </div>
 
                 <div class="form-actions">
-                    <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ URL_PREFIX }}/admin/dashboard" class="btn btn-secondary">Cancel</a>
                     <button type="submit" class="btn btn-primary">Create Poster & Edit Sections</button>
                 </div>
             </form>
@@ -68,6 +68,7 @@
     </main>
 
     <script>
+        const URL_PREFIX = "{{ URL_PREFIX }}";
         const form = document.getElementById('new-poster-form');
         const nameInput = document.getElementById('poster-name');
         const idInput = document.getElementById('poster-id');
@@ -124,7 +125,7 @@
             submitBtn.textContent = 'Creating poster...';
 
             try {
-                const response = await fetch('/admin/poster/create', {
+                const response = await fetch(`${URL_PREFIX}/admin/poster/create`, {
                     method: 'POST',
                     body: formData
                 });
@@ -133,7 +134,7 @@
 
                 if (result.success) {
                     alert('Poster created successfully!');
-                    window.location.href = `/admin/poster/${result.poster_id}/edit`;
+                    window.location.href = `${URL_PREFIX}/admin/poster/${result.poster_id}/edit`;
                 } else {
                     alert('Failed to create poster: ' + result.error);
                     submitBtn.disabled = false;
@@ -149,8 +150,8 @@
 
     <footer class="site-footer">
         <div class="container">
-            <small>&lt;/&gt; Developed by <a href="https://himanshu-portfolio-beryl.vercel.app/" target="_blank"
-                    rel="noopener noreferrer">Himanshu Fanibhare</a></small>
+            <small>&lt;/&gt; Developed at <a href="https://smartcitylivinglab.iiit.ac.in/" target="_blank"
+                    rel="noopener noreferrer">Smart City Research Center</a></small>
         </div>
     </footer>
 </body>

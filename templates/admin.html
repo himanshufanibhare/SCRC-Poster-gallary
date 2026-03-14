@@ -35,7 +35,7 @@
                     </svg>
                 </button>
                 {% endif %}
-                <a href="/admin" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin Dashboard">
+                <a href="{{ URL_PREFIX }}/admin" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin Dashboard">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="8" r="5" stroke="currentColor" stroke-width="2" />
                         <path d="M20 21c0-4.4-3.6-8-8-8s-8 3.6-8 8" stroke="currentColor" stroke-width="2" />
@@ -308,7 +308,7 @@
         // Load sections configuration and initialize highlights
         async function loadSections() {
             try {
-                const response = await fetch(`/api/sections?poster_id=${POSTER_ID}`);
+                const response = await fetch(`${URL_PREFIX}/api/sections?poster_id=${POSTER_ID}`);
                 const data = await response.json();
                 sectionsData = data.sections || [];
                 initializeHighlights();
@@ -979,7 +979,7 @@
 
         if (shareBtn) {
             shareBtn.addEventListener('click', async () => {
-                const posterUrl = `${window.location.origin}/poster/${POSTER_ID}`;
+                const posterUrl = `${window.location.origin}${URL_PREFIX}/${POSTER_ID}`;
                 const shareData = { title: document.title, text: 'Scan this QR to open the poster', url: posterUrl };
                 try {
                     if (navigator.share) {
@@ -1055,7 +1055,7 @@
         // Save sections configuration
         async function saveSections() {
             try {
-                const response = await fetch(`/api/sections?poster_id=${POSTER_ID}`, {
+                const response = await fetch(`${URL_PREFIX}/api/sections?poster_id=${POSTER_ID}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1317,8 +1317,8 @@
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
                 try {
-                    await fetch('/admin/logout', { method: 'POST' });
-                    window.location.href = '/';
+                    await fetch(`${URL_PREFIX}/admin/logout`, { method: 'POST' });
+                    window.location.href = `${URL_PREFIX}/`;
                 } catch (error) {
                     console.error('Logout failed:', error);
                 }
@@ -1407,7 +1407,7 @@
                 submitBtn.textContent = 'Uploading...';
 
                 try {
-                    const response = await fetch('/admin/upload-music', {
+                    const response = await fetch(`${URL_PREFIX}/admin/upload-music`, {
                         method: 'POST',
                         body: formData
                     });
@@ -1446,8 +1446,8 @@
 
     <footer class="site-footer">
         <div class="container">
-            <small>&lt;/&gt; Developed by <a href="https://himanshu-portfolio-beryl.vercel.app/" target="_blank"
-                    rel="noopener noreferrer">Himanshu Fanibhare</a></small>
+            <small>&lt;/&gt; Developed at <a href="https://smartcitylivinglab.iiit.ac.in/" target="_blank"
+                    rel="noopener noreferrer">Smart City Research Center</a></small>
         </div>
     </footer>
 </body>

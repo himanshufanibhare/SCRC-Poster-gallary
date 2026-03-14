@@ -17,7 +17,7 @@
                     or use the player below{% endif %}</p>
             </div>
             <div style="display:flex;gap:10px;align-items:center">
-                <a href="/" class="header-qr-btn" aria-label="Back to Gallery" title="Gallery">
+                <a href="{{ URL_PREFIX }}/" class="header-qr-btn" aria-label="Back to Gallery" title="Gallery">
                     <!-- Gallery/Grid icon -->
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect x="3" y="3" width="7" height="7" stroke="currentColor" stroke-width="1.5" rx="1" />
@@ -38,7 +38,7 @@
                     </svg>
                 </button>
                 {% endif %}
-                <a href="/admin/dashboard" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin">
+                <a href="{{ URL_PREFIX }}/admin/dashboard" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin">
                     <!-- Admin/Settings icon -->
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
@@ -111,6 +111,7 @@
     {% endif %}
 
     <script>
+        const URL_PREFIX = '{{ URL_PREFIX }}';
         const POSTER_ID = '{{ poster.id if poster else "scrc-architecture" }}';
         const audio = document.getElementById('audio');
         const btn = document.getElementById('play-btn');
@@ -216,7 +217,7 @@
         async function loadSections() {
             try {
                 console.log('Loading sections for poster:', POSTER_ID);
-                const response = await fetch(`/api/sections?poster_id=${POSTER_ID}`);
+                const response = await fetch(`${URL_PREFIX}/api/sections?poster_id=${POSTER_ID}`);
                 const data = await response.json();
                 sectionsData = data.sections || [];
                 console.log('Loaded', sectionsData.length, 'sections');
@@ -411,8 +412,8 @@
 
     <footer class="site-footer">
         <div class="container">
-            <small>&lt;/&gt; Developed by <a href="https://himanshu-portfolio-beryl.vercel.app/" target="_blank"
-                    rel="noopener noreferrer">Himanshu Fanibhare</a></small>
+            <small>&lt;/&gt; Developed at <a href="https://smartcitylivinglab.iiit.ac.in/" target="_blank"
+                    rel="noopener noreferrer">Smart City Research Center</a></small>
         </div>
     </footer>
 </body>

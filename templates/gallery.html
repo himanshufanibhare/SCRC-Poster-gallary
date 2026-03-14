@@ -16,7 +16,7 @@
                 <p class="site-sub">Select a poster to view</p>
             </div>
             <div style="display:flex;gap:10px;align-items:center">
-                <a href="/admin/dashboard" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin">
+                <a href="{{ URL_PREFIX }}/admin/dashboard" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin">
                     <!-- Admin/Settings icon -->
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
@@ -56,7 +56,7 @@
                         </div>
                     </div>
                     <div class="gallery-card-actions">
-                        <a href="/poster/{{ poster.id }}" class="gallery-btn gallery-btn-view gallery-btn-icon"
+                        <a href="{{ URL_PREFIX }}/{{ poster.id }}" class="gallery-btn gallery-btn-view gallery-btn-icon"
                             title="View poster">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
                                 xmlns="http://www.w3.org/2000/svg">
@@ -84,7 +84,7 @@
         </div>
         {% else %}
         <div class="card">
-            <p style="text-align:center;padding:20px;">No posters yet. <a href="/admin/dashboard"
+            <p style="text-align:center;padding:20px;">No posters yet. <a href="{{ URL_PREFIX }}/admin/dashboard"
                     style="color:var(--accent);">Create one</a> to get started!</p>
         </div>
         {% endif %}
@@ -124,6 +124,9 @@
     </div>
 
     <script>
+        // URL prefix for routing
+        const URL_PREFIX = "{{ URL_PREFIX }}";
+        
         // QR Modal handling
         const modal = document.getElementById('qr-modal');
         const modalImg = document.getElementById('qr-modal-img');
@@ -139,7 +142,7 @@
                 const posterId = btn.dataset.posterId;
                 currentPosterId = posterId;
                 try {
-                    const resp = await fetch(`/poster/${posterId}/qr`);
+                    const resp = await fetch(`${URL_PREFIX}/${posterId}/qr`);
                     if (!resp.ok) throw new Error('QR fetch failed');
                     const data = await resp.json();
                     if (data.qr_url) {
@@ -163,7 +166,7 @@
 
         if (shareBtn) {
             shareBtn.addEventListener('click', async () => {
-                const posterUrl = currentPosterId ? `${window.location.origin}/poster/${currentPosterId}` : window.location.href;
+                const posterUrl = currentPosterId ? `${window.location.origin}${URL_PREFIX}/${currentPosterId}` : window.location.href;
                 const shareData = {
                     title: document.title,
                     text: 'Scan this QR to open the poster',
@@ -228,8 +231,8 @@
 
     <footer class="site-footer">
         <div class="container">
-            <small>&lt;/&gt; Developed by <a href="https://himanshu-portfolio-beryl.vercel.app/" target="_blank"
-                    rel="noopener noreferrer">Himanshu Fanibhare</a></small>
+            <small>&lt;/&gt; Developed at <a href="https://smartcitylivinglab.iiit.ac.in/" target="_blank"
+                    rel="noopener noreferrer">Smart City Research Center</a></small>
         </div>
     </footer>
 </body>

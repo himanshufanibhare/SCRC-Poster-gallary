@@ -28,14 +28,12 @@
                     </svg>
                 </button>
                 {% endif %}
-                <a href="/admin/dashboard" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin">
+                <a href="{{ URL_PREFIX }}/admin/dashboard" class="header-qr-btn" aria-label="Admin Dashboard" title="Admin">
                     <!-- Admin/Settings icon -->
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5" />
-                        <path d="M12 1v6m0 6v10M1 12h6m6 0h10" stroke="currentColor" stroke-width="1.5"
-                            stroke-linecap="round" />
-                        <path d="M4.22 4.22l4.24 4.24m7.07 0l4.24-4.24M4.22 19.78l4.24-4.24m7.07 0l4.24 4.24"
-                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M12 1v6m0 6v10M1 12h6m6 0h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                        <path d="M4.22 4.22l4.24 4.24m7.07 0l4.24-4.24M4.22 19.78l4.24-4.24m7.07 0l4.24 4.24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
                 </a>
             </div>
@@ -101,6 +99,7 @@
     {% endif %}
 
     <script>
+        const URL_PREFIX = '{{ URL_PREFIX }}';
         const POSTER_ID = '{{ poster.id if poster else "scrc-architecture" }}';
         const audio = document.getElementById('audio');
         const btn = document.getElementById('play-btn');
@@ -206,7 +205,7 @@
         async function loadSections() {
             try {
                 console.log('Loading sections for poster:', POSTER_ID);
-                const response = await fetch(`/api/sections?poster_id=${POSTER_ID}`);
+                const response = await fetch(`${URL_PREFIX}/api/sections?poster_id=${POSTER_ID}`);
                 const data = await response.json();
                 sectionsData = data.sections || [];
                 console.log('Loaded', sectionsData.length, 'sections');
@@ -370,7 +369,7 @@
 
         if (shareBtn) {
             shareBtn.addEventListener('click', async () => {
-                const posterUrl = `${window.location.origin}/poster/${POSTER_ID}`;
+                const posterUrl = `${window.location.origin}${URL_PREFIX}/${POSTER_ID}`;
                 const shareData = { title: document.title, text: 'Scan this QR to open the poster', url: posterUrl };
                 try {
                     if (navigator.share) {
@@ -401,8 +400,8 @@
 
     <footer class="site-footer">
         <div class="container">
-            <small>&lt;/&gt; Developed by <a href="https://himanshu-portfolio-beryl.vercel.app/" target="_blank"
-                    rel="noopener noreferrer">Himanshu Fanibhare</a></small>
+            <small>&lt;/&gt; Developed at <a href="https://smartcitylivinglab.iiit.ac.in/" target="_blank"
+                    rel="noopener noreferrer">Smart City Research Center</a></small>
         </div>
     </footer>
 </body>

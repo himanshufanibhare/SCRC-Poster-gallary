@@ -336,8 +336,8 @@ This project is open source and available for educational and commercial use.
 
 ## 👨‍💻 Developer
 
-**Himanshu Fanibhare**
-- Portfolio: [himanshu-portfolio-beryl.vercel.app](https://himanshu-portfolio-beryl.vercel.app/)
+**Smart City Research Center**
+- Portfolio: [himanshu-portfolio-beryl.vercel.app](https://smartcitylivinglab.iiit.ac.in/)
 - GitHub: [@himanshufanibhare](https://github.com/himanshufanibhare)
 
 ## 🙏 Acknowledgments
