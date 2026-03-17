@@ -66,7 +66,7 @@
             </div>
 
             <div class="controls">
-                <audio id="audio" src="{% if poster %}/music/{{ poster.id }}{% else %}/music.mp3{% endif %}"
+                <audio id="audio" src="{% if poster %}{{ URL_PREFIX }}/music/{{ poster.id }}{% else %}{{ URL_PREFIX }}/music.mp3{% endif %}"
                     preload="none"></audio>
                 <button id="play-btn" class="play-btn" aria-label="Play">Play</button>
             </div>

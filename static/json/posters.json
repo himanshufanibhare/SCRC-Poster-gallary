@@ -5,7 +5,7 @@
       "name": "SCRC Architecture",
       "description": "",
       "image": "scrc-architecture_6x3_Living_lab_page-0001.jpg",
-      "music": "scrc-architecture_white_records-road-of-deception-instrumental-background-music-for-video-39-second-446170.mp3",
+      "music": "scrc-architecture_6x3_Living_lab_page-0001.mp3",
       "sections_file": "sections_scrc-architecture.json",
       "created": "2026-02-13",
       "qr_code": "qr_scrc-architecture.png"
@@ -15,7 +15,7 @@
       "name": "MultiLink",
       "description": "",
       "image": "multilink_Slide1.jpg",
-      "music": "music_multilink.mp3",
+      "music": "multilink_Slide1.mp3",
       "sections_file": "sections_multilink.json",
       "created": "2026-03-10",
       "qr_code": "qr_multilink.png"
