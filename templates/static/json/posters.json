@@ -1,0 +1,24 @@
+{
+  "posters": [
+    {
+      "id": "scrc-architecture",
+      "name": "SCRC Architecture",
+      "description": "",
+      "image": "scrc-architecture_6x3_Living_lab_page-0001.jpg",
+      "music": "scrc-architecture_6x3_Living_lab_page-0001.mp3",
+      "sections_file": "sections_scrc-architecture.json",
+      "created": "2026-02-13",
+      "qr_code": "qr_scrc-architecture.png"
+    },
+    {
+      "id": "multilink",
+      "name": "MultiLink",
+      "description": "",
+      "image": "multilink_Slide1.jpg",
+      "music": "multilink_Slide1.mp3",
+      "sections_file": "sections_multilink.json",
+      "created": "2026-03-10",
+      "qr_code": "qr_multilink.png"
+    }
+  ]
+}

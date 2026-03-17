@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>SCRC Poster Gallery</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 
 <body>
@@ -16,7 +16,7 @@
                 <p class="site-sub">Edit poster sections</p>
             </div>
             <div style="display:flex;gap:10px">
-                <a href="/" class="header-qr-btn" aria-label="Home Gallery" title="Home">
+                <a href="{{ URL_PREFIX }}/" class="header-qr-btn" aria-label="Home Gallery" title="Home">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"
                         xmlns="http://www.w3.org/2000/svg">
                         <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />

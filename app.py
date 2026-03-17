@@ -8,12 +8,12 @@ import json
 from datetime import datetime
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='templates/static', static_url_path='/static')
 app.secret_key = os.environ.get("SECRET_KEY", "scrc-admin-key-2026")  # Change this in production
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 
 # Folder structure
-STATIC_FOLDER = "static"
+STATIC_FOLDER = "templates/static"
 POSTERS_FOLDER = os.path.join(STATIC_FOLDER, "posters")
 MUSIC_FOLDER = os.path.join(STATIC_FOLDER, "music")
 QR_FOLDER = os.path.join(STATIC_FOLDER, "qr")
